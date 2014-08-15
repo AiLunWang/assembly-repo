@@ -1,0 +1,42 @@
+	.psize		42
+	.title		"Twice as fun as fun1"
+	
+	.text		1
+	.text		0
+	.global		_start
+
+_start:
+
+/*
+ *	d0		counter
+ *	d1		current sum
+ *	a0		pointer for array1
+ *	a1		pointer for array2
+ *	a2		pointer for array3
+ */
+ 
+			/* Set the counter. */
+			move.l	N, d0
+		
+			/* Initialize each of the pointers. */
+			movea.l	#array1, a0
+			movea.l #array2, a1
+			movea.l #array3, a2
+			
+			/* Do the sum and store it in array3. */
+Loop:		
+			move.l	(a0)+, d1	
+			add.l	(a1)+, d1
+			move.l	d1, (a2)+
+			
+			/* Decrement the counter */
+			sub.l	#1, d0
+			cmp.l #0, d0
+			bne Loop
+			
+			rts
+	.data
+N:  		.long	5  
+array1:		.long	1,2,3,4,5
+array2:		.long	11,12,13,14,15
+array3:		.skip	20
