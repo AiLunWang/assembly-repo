@@ -1,0 +1,77 @@
+	.psize 42
+	.title "Fun4"
+	
+	.text 0
+	.text 1
+	.global	_start
+
+_start: 	
+
+Main:
+	/* Load pointers for each of the arrays into the address registers. */
+	movea.l #B1, a0
+	movea.l #B2, a1
+	movea.l #B3, a2
+	
+	/* Dereference the pointers for B1 and B2 because we need to read them. */
+	move.l (a0), d0
+	move.l (a1), d1
+	
+	/* Push parameters onto the stack. */
+	move.l a2, -(sp) /* int* p = &B3[0] */
+	move.l d1, -(sp) /* int  b = B2[0] */
+	move.l d0, -(sp) /* int  a = B1[0] */
+	
+	bsr StoreGreater   /* void StoreGreater(int a, int b, int* p) */
+	
+	/* Restore stack. */
+	add.l #12, sp
+	
+	/* End program. */
+	rts
+
+/*
+ * void StoreGreater(int a, int b, int* p)
+ *
+ * Stores the greater of a and b in location p.
+ *
+ * Register map:
+ *		d0		int  a
+ *		d1		int  b
+ *		a0		int* p
+ */
+StoreGreater:
+  
+/* Save registers. */
+ 	movem.l	d0-d1/a0,-(sp)
+
+/* Load parameters. */
+	move.l 16(sp), d0
+	move.l 20(sp), d1
+	movea.l	24(sp), a0
+	
+StoreGreater__If:			/* is (d1 > d0) ? */
+	cmp.l	d0, d1 			/* update on d1 - d0 */
+	bgt StoreGreater__Then	/* d1 > d0 */
+	bra StoreGreater__Else	/* else */
+StoreGreater__Then:  		/* d1 > d0 */
+	move.l	d1, (a0)
+	bra StoreGreater__Endif
+StoreGreater__Else:			/* d1 <= d0 */
+	move.l	d0, (a0)
+StoreGreater__Endif:
+
+/* Restore registers. */
+	movem.l	(sp)+, d0-d1/a0
+	
+	rts	 
+/* end StoreGreater */
+
+	.data
+	.align
+B1:		.long	1, 7, 16, 54
+B2:		.long	-8, 0, 16, 56
+B3:		.skip	16
+	.align
+N:		.long	4
+	.end
