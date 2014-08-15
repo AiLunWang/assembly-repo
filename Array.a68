@@ -1,0 +1,32 @@
+		.PSIZE	42
+		.TITLE	"Quick Tour of bdb Features"
+		
+		/* Include the file ASCII.i. */
+		.NOLIST
+		.INCLUDE "..\\Include\\ASCII.i"
+		.LIST
+		
+		/* constants */		
+		.TEXT	1
+		
+		/* code */
+		.TEXT	0
+		.GLOBAL Start
+		
+Start:
+		move.l 	N, d0
+		movea.l #Array, a0
+		move.l 	#0, d1
+Loop:	
+		add.l	(a0)+, d1
+		sub.l	#1, d0
+		cmp.l	#0, d0
+		bgt		Loop 
+				
+		rts
+		
+		/* memory */
+		.DATA
+
+Array:	.long	1,2,3,4,5,6,7,8,9,10
+N:		.long	10
